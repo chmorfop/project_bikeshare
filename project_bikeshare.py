@@ -2,6 +2,7 @@ import time
 import pandas as pd
 import numpy as np
 from datetime import timedelta
+import tarfile
 
 CITY_DATA = { 'chicago': 'chicago.csv',
               'new york city': 'new_york_city.csv',
@@ -14,7 +15,6 @@ def get_filters():
 
     print('\nHello! Let\'s explore some US bikeshare data.\n')
     # get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
-
     while(1):
         print('Please type a city to explore :\'Chicago\' or \'New York City \' or \'Washington \'.')
         fir_string=input('Type a city..\n')
@@ -167,7 +167,7 @@ def trip_duration_stats(df):
     print('\nCalculating statistics on the total and average trip duration..\n')
     start_time = time.time()
 
-    # display total travel time
+    # display total& average travel time
     t1 = pd.to_datetime(df['Start Time'])
     t2= pd.to_datetime(df['End Time'])
 
@@ -216,17 +216,51 @@ def user_stats(df,city):
     print('-'*40)
 
 
-def main():
 
+def display_data(df):
+    flag=0
+    f_index=0
+    s_index=5
+    while(1):
+        if flag==0:
+            fir_string = input('Do you want to see five lines of Raw Data?\nType \'yes\' or \'no\' \n')
+            string = fir_string.lower()
+        else:
+            fir_string = input('Do you want to see Another five lines of Raw Data?\nType \'yes\' or \'no\' \n') # I just Another five lines in the string .. adding a flag!
+            string = fir_string.lower()
+
+        if string in ('yes', 'y'):
+            flag=1
+            print(df.iloc[f_index:s_index])
+            f_index=s_index
+            s_index=s_index+5
+            print('\n')
+        elif string in ('no', 'n'):
+            return
+
+
+def main():
+    tf = tarfile.open("chicago.tar.gz")
+    tf.extractall()
     while(1):
         city, month, day = get_filters()
         df = load_data(city, month, day)
-        print(df.head())
-        print(df.shape)
+        #print(df.head())
+        #print(df.shape)
+        
+
+
+
+
         time_stats(df)
+
         station_stats(df)
+
         trip_duration_stats(df)
+
         user_stats(df,city)
+
+        display_data(df)
 
         restart = input('\nWould you like to restart? Enter yes or no.\n')
         if restart.lower() != 'yes':
